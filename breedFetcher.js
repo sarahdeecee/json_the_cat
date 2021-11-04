@@ -1,21 +1,10 @@
 const request = require('request');
 
-const args = (process.argv).slice(2);
-const argString = args.toString();
-let searchedBreed = '';
-// if more than one word, adjust searchedBreed string
-if (argString.includes(',')) {
-  searchedBreed = argString.replace(/,/g,' ');
-} else {
-  searchedBreed = argString;
-}
-
-const fetchBreedDescription = (url, breed) => {
-  request(url, (error, response, body) => {
-    // if error, error message and exit
+const fetchBreedDescription = (breed, callback) => {
+  const URL = 'https://api.thecatapi.com/v1/breeds';
+  request(URL, (error, response, body) => {
     if (error) {
-      console.log('Please enter a valid URL');
-      process.exit();
+      callback(error, null);
     }
     const data = JSON.parse(body);
     //find name in object
@@ -23,13 +12,16 @@ const fetchBreedDescription = (url, breed) => {
     if (!breedData) {
       //look for name in alt_names
       breedData = data.find(catBreed => catBreed['alt_names'] === titleCase(breed));
-      if (!breedData) {
-        //if not found
-        console.log(`Could not find ${breed}.\nPlease enter another breed name.`);
-        process.exit();
-      }
     }
-    console.log(breedData.description);
+    // if (!breedData) {
+    //   throw new Error (`Could not find ${breed}.\nPlease enter another breed name.`);
+    // } else {
+    // }
+    if (breedData) {
+      callback(null, breedData.description);
+    } else {
+      callback(error, null);
+    }
   });
 };
 
@@ -45,5 +37,4 @@ const titleCase = (str) => {
   return result;
 };
 
-const URL = 'https://api.thecatapi.com/v1/breeds';
-fetchBreedDescription(URL,searchedBreed);
+module.exports = { fetchBreedDescription };
