@@ -10,7 +10,7 @@ if (argString.includes(',')) {
   searchedBreed = argString;
 }
 
-const breedFetcher = (url, breed) => {
+const fetchBreedDescription = (url, breed) => {
   request(url, (error, response, body) => {
     // if error, error message and exit
     if (error) {
@@ -46,4 +46,4 @@ const titleCase = (str) => {
 };
 
 const URL = 'https://api.thecatapi.com/v1/breeds';
-breedFetcher(URL,searchedBreed);
+fetchBreedDescription(URL,searchedBreed);
